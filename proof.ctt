@@ -1,0 +1,61 @@
+module proof where
+
+-- Declares standard homogeneous path type from
+-- the heterogeneous path type PathP.
+Path (A : U) (a b : A) : U = PathP (<_> A) a b
+
+-- Encodes the logical relation of an asymmetric path as a Cubical Type.
+-- An asymmetric path is the general case of normal paths (of total functions).
+asym (A B C D : U) (f : A -> B) (g1 : A -> C) (g2 : B -> D) (h : C -> D) : U =
+  Path (A -> D) (\(x : A) -> (g2 (f x))) (\(x : A) -> (h (g1 x)))
+
+{-
+
+Proof that asymmetric paths composes in path-space:
+
+          f[g1 -> g2][g3 -> g4] <=> f[(g3 . g1) -> (g4 . g2)]
+
+Where:
+
+          f[g1 -> g2] <=> f2
+          f2[g3 -> g4] <=> h
+
+This proof uses the diagonal commuting square,
+due to Cubical Types not being strong enough to prove both squares.
+When working with the interior, one is restricted to equivalences,
+which is not enough to prove the full case of normal paths.
+
+          A     g1        C      g3       E
+          o-------------->o-------------->o
+          |               |               |
+          |               |               |
+        f |            f2 |               | h
+          |               |               |
+          V               V               V
+          o-------------->o-------------->o
+          B      g2       D       g4      F
+
+However, the diagonal commuting square is sufficient, although more indirect:
+
+          A     g1        C
+          o-------------->o
+            \             |  \
+               \          |     \  (g4 o f)
+                  \    f2 |        \
+          (f2 o g1)  \    |           \
+                        \ V       g4     \
+                          o-------------->o
+                          D               F
+
+The returned `asym` is not the actual type of the composed square
+in path space, but it serves as a proof that the full composed square exists.
+This is due to the diagonal morphisms being shared by the missing vertices.
+
+-}
+asym_proof (A B C D E F : U)
+  (f : A -> B) (g1 : A -> C) (g2 : B -> D)
+  (f2 : C -> D) (g3 : C -> E) (g4 : D -> F) (h : E -> F)
+  (p1 : asym A B C D f g1 g2 f2)
+  (p2 : asym C D E F f2 g3 g4 h):
+  (asym A D C F (\(x : A) -> f2 (g1 x)) g1 g4 (\(x : C) -> g4 (f2 x))) =
+  <i> \(x : A) -> g4 (f2 (g1 x))

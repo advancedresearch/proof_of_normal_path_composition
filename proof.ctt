@@ -40,7 +40,7 @@ However, the diagonal commuting square is sufficient, although more indirect:
           A     g1        C
           o-------------->o
             \             |  \
-               \          |     \  (g4 o f)
+               \          |     \  (g4 o f2)
                   \    f2 |        \
           (f2 o g1)  \    |           \
                         \ V       g4     \
